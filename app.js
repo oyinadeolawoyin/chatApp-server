@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const authRoutes = require("./src/routes/authRoutes");
+const contactRoutes = require("./src/routes/contactRoutes");
+const groupRoutes = require("./src/routes/groupRoutes");
 
 
 app.use(express.json());
@@ -20,6 +22,8 @@ app.use(cors({
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/contact", authenticateJWT, contactRoutes);
+app.use("/api/groups", authenticateJWT, groupRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

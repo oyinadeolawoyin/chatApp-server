@@ -3,8 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("../config/jwt");
 const authService = require("../services/authService");
 const { validationResult } = require("express-validator");
-
-
+const { uploadFile } = require("./fileController");
 
 const cookieOptions = {
     httpOnly: true,
@@ -14,7 +13,6 @@ const cookieOptions = {
 };
   
 async function signup(req, res) {
-    console.log("signup...")
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -23,22 +21,38 @@ async function signup(req, res) {
     }
 
     const { username, password, email, country, gender, bio } = req.body;
+    const file = req.file;
     try {
         const existingUser = await authService.findUserByEmail(email);
         if (existingUser) return res.status(400).json({ message: "User already exists"});
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await authService.createUser({
-            username,
-            password: hashedPassword, 
-            email, 
-            country, 
-            gender, 
-            bio
-        });
-        const token = jwt.generateToken(user); 
-        res.cookie("token", token, cookieOptions).status(200).json({ token: token });
+        if (file) {
+            const image = await uploadFile(file);
+            const user = await authService.createUser({
+                username,
+                password: hashedPassword, 
+                email, 
+                country, 
+                gender, 
+                image,
+                bio
+            });
+            const token = jwt.generateToken(user); 
+            res.cookie("token", token, cookieOptions).status(200).json({ token: token });
+        } else {
+            const user = await authService.createUser({
+                username,
+                password: hashedPassword, 
+                email, 
+                country, 
+                gender, 
+                bio
+            });
+            const token = jwt.generateToken(user); 
+            res.cookie("token", token, cookieOptions).status(200).json({ token: token });
+        }
     } catch (error) {
         res.status(500).json({ error: error.message || "Something went wrong" });
     }

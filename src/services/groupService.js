@@ -9,6 +9,10 @@ async function createGroup({ groupname, userId }) {
     })
 }
 
+async function fetchAllGroup() {
+    return await prisma.group.findMany()
+}
+
 async function fetchGroups(userId) {
     return await prisma.group.findMany({
         where: { createdById: userId },
@@ -49,9 +53,37 @@ async function newMember({ membername, userId, groupId }) {
     })
 }
 
+async function createChat({ username, content, image, userId, groupId }) {
+    return prisma.chat.create({
+        data: {
+            username,
+            content: content,
+            userId: userId,
+            image: image,
+            groupId: Number(groupId)
+        }
+    })
+}
+
+async function fetchChats(groupId) {
+    return await prisma.chat.findMany({
+       where: { groupId: Number(groupId) },
+    })
+}
+
+async function deleteChat(chatId) {
+    return await prisma.chat.delete({
+        where: { id: Number(chatId) }
+    })
+}
+
 module.exports = {
     createGroup,
+    fetchAllGroup,
     fetchGroups,
     fetchGroup,
-    newMember
+    newMember,
+    createChat,
+    fetchChats,
+    deleteChat
 }

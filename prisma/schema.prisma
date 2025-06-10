@@ -12,19 +12,21 @@ model User {
   username   String    @unique
   password   String
   email      String    @unique
-  country    String?
-  gender     String?
+  country    String?   @default("Global")
+  gender     String?   @default("They")
+  image      String?
   bio        String?
 
   contacts   Contact[]
-  messages   Message[]
   groups     Group[]
-  members    Member[]
+  member     Member[]
+  chats      Chat[]
 }
 
 model Contact {
   id          Int       @id @default(autoincrement())
   friendName  String
+  status      String    @default("unblock")
   user        User      @relation(fields: [userId], references: [id])
   userId      Int
   chats       Chat[]
@@ -51,19 +53,13 @@ model Member {
 model Chat {
   id          Int       @id @default(autoincrement())
   username    String
+  content     String?
+  image       String?    
+  uploadedAt  DateTime?  @default(now())
+  user        User?      @relation(fields: [userId], references: [id])
+  userId      Int?
   contact     Contact?  @relation(fields: [contactId], references: [id])
   contactId   Int?
   group       Group?    @relation(fields: [groupId], references: [id])
   groupId     Int?
-  messages    Message[]
-}
-
-model Message {
-  id          Int       @id @default(autoincrement())
-  content     String
-  uploadedAt  DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int
-  chat        Chat      @relation(fields: [chatId], references: [id])
-  chatId      Int
 }

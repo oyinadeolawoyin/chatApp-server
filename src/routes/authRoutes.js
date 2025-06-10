@@ -3,6 +3,8 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 const { body } = require("express-validator");
 const { authenticateJWT } = require("../config/jwt");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 const validateForm = [
   body("username")
@@ -59,7 +61,7 @@ const validateLogin = [
 
 
 
-router.post("/signup", validateForm, authController.signup);
+router.post("/signup", upload.single("file"), validateForm, authController.signup);
 router.post("/login", validateLogin, authController.login);
 router.post("/logout", validateLogin, authController.logout);
 router.get("/me", authenticateJWT, authController.getMe);

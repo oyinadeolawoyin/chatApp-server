@@ -12,7 +12,7 @@ async function findUserByUsername(username) {
     });
 }
 
-async function createUser({ username, password,  email, country, gender, bio }) {
+async function createUser({ username, password,  email, country, image, gender, bio }) {
     return await prisma.user.create({
       data: {
         username,
@@ -20,6 +20,7 @@ async function createUser({ username, password,  email, country, gender, bio }) 
         email,
         country,
         gender,
+        image: image || null,
         bio
       },
     });

@@ -40,7 +40,14 @@ async function signup(req, res) {
                 bio
             });
             const token = jwt.generateToken(user); 
-            res.cookie("token", token, cookieOptions).status(200).json({ token: token });
+            res.cookie("token", token, cookieOptions).status(200).json({
+                token: token,
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email
+                }
+            });
         } else {
             const user = await authService.createUser({
                 username,
@@ -77,7 +84,14 @@ async function login(req, res) {
         if(!valid) return res.status(401).json({ error: "Invalid password" });
 
         const token = jwt.generateToken(user); 
-        res.cookie("token", token, cookieOptions).status(200).json({ token: token });
+        res.cookie("token", token, cookieOptions).status(200).json({
+            token: token,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: error.message || "Login error." });
     }

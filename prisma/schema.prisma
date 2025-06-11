@@ -8,19 +8,21 @@ datasource db {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  username   String    @unique
-  password   String
-  email      String    @unique
-  country    String?   @default("Global")
-  gender     String?   @default("They")
-  image      String?
-  bio        String?
+  id             Int       @id @default(autoincrement())
+  username       String    @unique
+  password       String
+  email          String    @unique
+  country        String?   @default("Global")
+  gender         String?   @default("They")
+  image          String?
+  bio            String?
 
-  contacts   Contact[]
-  groups     Group[]
-  member     Member[]
-  chats      Chat[]
+  contacts       Contact[]
+  groups         Group[]
+  member         Member[]
+  chats          Chat[]   @relation("ChatUsers")
+  likes          Like[] 
+  notifications  Notification[]
 }
 
 model Contact {
@@ -29,7 +31,7 @@ model Contact {
   status      String    @default("unblock")
   user        User      @relation(fields: [userId], references: [id])
   userId      Int
-  chats       Chat[]
+  chats       Chat[]    @relation("ChatContacts")
 }
 
 model Group {
@@ -51,15 +53,30 @@ model Member {
 }
 
 model Chat {
+  id              Int         @id @default(autoincrement())
+  username        String
+  content         String?
+  image           String?    
+  uploadedAt      DateTime?   @default(now())
+  users           User[]      @relation("ChatUsers")
+  contact         Contact[]   @relation("ChatContacts")
+  group           Group?      @relation(fields: [groupId], references: [id])
+  groupId         Int?
+  likes           Like[]       
+}
+
+model Like {
   id          Int       @id @default(autoincrement())
-  username    String
-  content     String?
-  image       String?    
-  uploadedAt  DateTime?  @default(now())
-  user        User?      @relation(fields: [userId], references: [id])
-  userId      Int?
-  contact     Contact?  @relation(fields: [contactId], references: [id])
-  contactId   Int?
-  group       Group?    @relation(fields: [groupId], references: [id])
-  groupId     Int?
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  chat        Chat      @relation(fields: [chatId], references: [id])
+  chatId      Int
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  name      String
+  action    String
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
 }

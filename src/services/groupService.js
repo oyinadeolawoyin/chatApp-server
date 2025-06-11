@@ -33,14 +33,26 @@ async function fetchGroup(groupId) {
         where: { id: Number(groupId) },
         include: {
             members: true,
-            chats: true,
+            chats: {
+                include: {
+                    likes: {
+                        include: {
+                            user: {
+                                select: {
+                                    username: true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             createdBy: {
                 select: {
-                  username: true
+                    username: true
                 }
             }
         }
-    })
+    });
 }
 
 async function newMember({ membername, userId, groupId }) {
@@ -58,22 +70,27 @@ async function createChat({ username, content, image, userId, groupId }) {
         data: {
             username,
             content: content,
-            userId: userId,
             image: image,
-            groupId: Number(groupId)
+            groupId: Number(groupId),
+            users: {
+                connect: [{ id: Number(userId) }]
+            }
         }
-    })
-}
-
-async function fetchChats(groupId) {
-    return await prisma.chat.findMany({
-       where: { groupId: Number(groupId) },
-    })
+    });
 }
 
 async function deleteChat(chatId) {
     return await prisma.chat.delete({
         where: { id: Number(chatId) }
+    })
+}
+
+async function likeChat(chatId, userId) {
+    return await prisma.like.create({
+        data: { 
+            chatId: Number(chatId),
+            userId: Number(userId)
+        }
     })
 }
 
@@ -84,6 +101,6 @@ module.exports = {
     fetchGroup,
     newMember,
     createChat,
-    fetchChats,
-    deleteChat
+    deleteChat,
+    likeChat
 }

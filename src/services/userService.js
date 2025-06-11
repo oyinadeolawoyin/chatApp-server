@@ -16,6 +16,7 @@ async function fetchUser(userId) {
                 }
             },
             chats: true,
+            notifications: true
         }
     })   
 }
@@ -35,7 +36,18 @@ async function updateUser({ username, hashPassword, email, country, gender, imag
     });
 }
 
+async function notification({ user, friendId, action }) {
+    return prisma.notification.create({
+        data: {
+            name: user,
+            action,
+            userId: friendId
+        }
+    })
+}
+
 module.exports = {
     fetchUser,
-    updateUser
+    updateUser,
+    notification
 }

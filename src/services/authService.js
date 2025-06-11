@@ -8,7 +8,10 @@ async function findUserByEmail(email) {
 
 async function findUserByUsername(username) {
     return await prisma.user.findUnique({
-        where: { username }
+        where: { username },
+        include: {
+          contacts: true
+        }
     });
 }
 

@@ -8,7 +8,6 @@ const upload = multer({ dest: "uploads/" });
 const validateForm = [
   body("content")
     .trim()
-    .escape(),
 ];
 
 
@@ -18,7 +17,7 @@ router.get("/:groupId", groupController.fetchGroup);
 router.post("/new-group", groupController.createGroup);
 router.post("/:groupId/member", groupController.newMember);
 router.post("/:groupId/chat", upload.single("file"), validateForm, groupController.createChat);
-router.get("/:groupId/chats", groupController.fetchChats);
 router.delete("/:groupId/chats/:chatId", groupController.deleteChat);
+router.post("/:groupId/chats/:chatId/liked/:username", groupController.likeChat);
 
 module.exports = router;

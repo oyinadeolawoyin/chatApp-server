@@ -37,6 +37,7 @@ async function updateUser(req, res) {
     }
 }
 
+
 module.exports = {
     fetchUser,
     updateUser

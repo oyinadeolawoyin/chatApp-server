@@ -1,6 +1,8 @@
 const groupService = require("../services/groupService");
 const { validationResult } = require("express-validator");
 const { uploadFile } = require("./fileController");
+const userService = require("../services/userService");
+const authService = require("../services/authService");
 
 async function createGroup(req, res) {
     const { groupname } = req.body;
@@ -66,6 +68,7 @@ async function createChat(req, res) {
     const { groupId } = req.params;
     const { content } = req.body;
     const file = req.file;
+    
     try {
         const username = req.user.username;
         const userId = Number(req.user.id);
@@ -82,16 +85,6 @@ async function createChat(req, res) {
     }
 }
 
-async function fetchChats(req, res) {
-    const { groupId } = req.params;
-    try {
-        const chats = await groupService.fetchChats(groupId);
-        res.status(200).json({ chats: chats });
-    } catch(error) {
-        res.status(500).json({ message: error.message || "Something is wrong." });
-    }
-}
-
 async function deleteChat(req, res) {
     const { chatId } = req.params;
     try {
@@ -102,6 +95,23 @@ async function deleteChat(req, res) {
     }
 }
 
+async function likeChat(req, res) {
+    const { chatId, username } = req.params;
+    const userId = req.user.id;
+
+    const friend = await authService.findUserByUsername(username);
+    const friendId = Number(friend.id);
+    const action = "liked";
+    const user = req.user.username;
+    try {
+        const like = await groupService.likeChat(chatId, userId);
+        await userService.notification({ user, friendId, action });
+        res.status(200).json({ like: like });
+    } catch(error) {
+        res.status(500).json({ message: error.message || "Something went wrong." })
+    }
+}
+
 module.exports = {
     createGroup,
     fetchAllGroup,
@@ -109,6 +119,6 @@ module.exports = {
     fetchGroup,
     newMember,
     createChat,
-    fetchChats,
-    deleteChat
+    deleteChat,
+    likeChat
 }

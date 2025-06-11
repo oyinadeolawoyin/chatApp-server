@@ -76,8 +76,7 @@ async function login(req, res) {
        
         if(!valid) return res.status(401).json({ error: "Invalid password" });
 
-        const token = jwt.generateToken(user);
-
+        const token = jwt.generateToken(user); 
         res.cookie("token", token, cookieOptions).status(200).json({ token: token });
     } catch (error) {
         res.status(500).json({ error: error.message || "Login error." });

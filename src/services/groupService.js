@@ -10,7 +10,29 @@ async function createGroup({ groupname, userId }) {
 }
 
 async function fetchAllGroup() {
-    return await prisma.group.findMany()
+    return await prisma.group.findMany({
+        include: {
+            members: true,
+            chats: {
+                include: {
+                    likes: {
+                        include: {
+                            user: {
+                                select: {
+                                    username: true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            createdBy: {
+                select: {
+                  username: true
+                }
+            }
+        }
+    })
 }
 
 async function fetchGroups(userId) {

@@ -50,6 +50,10 @@ async function newMember(req, res) {
     try{
         const userId = Number(req.user.id);
         const membername = req.user.username;
+        const member = await groupService.findMember({ membername, groupId });
+
+        if (member) return res.status(400).json({ message: "Member already exist." });
+
         const newMember = await groupService.newMember({ membername, userId, groupId });
         res.status(200).json({ member: newMember });
     } catch(error) {

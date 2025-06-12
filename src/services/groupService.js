@@ -55,6 +55,15 @@ async function fetchGroup(groupId) {
     });
 }
 
+async function findMember({ groupId, membername}) {
+    return prisma.member.findFirst({
+        where: {
+            groupId: Number(groupId),
+            memberName: membername
+        }
+    })
+}
+
 async function newMember({ membername, userId, groupId }) {
     return prisma.member.create({
         data: {
@@ -100,6 +109,7 @@ module.exports = {
     fetchGroups,
     fetchGroup,
     newMember,
+    findMember,
     createChat,
     deleteChat,
     likeChat
